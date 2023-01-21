@@ -9,6 +9,8 @@
 
 /* static variables */
 static BLDC_Direction_t _direction = DIRECTION_POSITIVE;
+static uint32_t _hall_tim_count_old = 0xFFFFFFFF;
+static uint32_t _hall_tim_count = 0;
 static const uint32_t _com_table_positive[6] = {
     BLDC_COM_ABC_001, BLDC_COM_ABC_101, BLDC_COM_ABC_100,
     BLDC_COM_ABC_110, BLDC_COM_ABC_010, BLDC_COM_ABC_011};
@@ -37,9 +39,7 @@ static void BLDC_InitHallPheripherals(void) {
 
   // set TIM counting method
   LL_TIM_InitTypeDef TIM_InitStruct = {0};
-  TIM_InitStruct.Prescaler =
-      0xFFFF;  // TODO: for slower motor speed, this value must be larger to
-               // avoid overflowing the counter pass autoreload value
+  TIM_InitStruct.Prescaler = 0;
   TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
   TIM_InitStruct.Autoreload = 0xFFFF;  // fixed to max value
   TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
@@ -62,7 +62,12 @@ static void BLDC_InitHallPheripherals(void) {
   // set TIM trigger output to OC2REF
   LL_TIM_SetTriggerOutput(BLDC_HALL_TIM_PORT, LL_TIM_TRGO_CC1IF);
 
+  // set interrupt generation when overflow
+  LL_TIM_SetUpdateSource(BLDC_HALL_TIM_PORT, LL_TIM_UPDATESOURCE_COUNTER);
+  LL_TIM_EnableIT_UPDATE(BLDC_HALL_TIM_PORT);
+
   // enable TIM
+  LL_TIM_EnableIT_CC1(BLDC_HALL_TIM_PORT);
   LL_TIM_EnableCounter(BLDC_HALL_TIM_PORT);
   LL_TIM_CC_EnableChannel(BLDC_HALL_TIM_PORT, LL_TIM_CHANNEL_CH1);
 }
@@ -130,8 +135,6 @@ void BLDC_Init(void) {
   BLDC_InitHallPheripherals();
   BLDC_InitPWMPheripherals();
   BLDC_InitComTable();
-
-  LL_TIM_EnableIT_CC1(BLDC_HALL_TIM_PORT);
 }
 
 void BLDC_Start(void) {
@@ -323,12 +326,33 @@ static void BLDC_PreloadPWMOutput(uint8_t pos, BLDC_Direction_t dir) {
 #endif
 }
 
-void BLDC_HALL_TIM_IRQHandler() {
-  LL_TIM_ClearFlag_CC1(BLDC_HALL_TIM_PORT);
+float BLDC_GetSpeed(void) {
+  return (float)SystemCoreClock /
+         ((float)_hall_tim_count_old * ((BLDC_NUM_POLES >> 1) * 3));
+}
 
-  BLDC_Direction_t dir = _direction;
-  uint8_t pos = BLDC_ReadPosition();
-  BLDC_PreloadPWMOutput(pos, dir);
-  LL_TIM_GenerateEvent_COM(BLDC_PWM_TIM_PORT);
-  BLDC_PreloadPWMOutput(next_pos(pos, dir), dir);
+void BLDC_HALL_TIM_IRQHandler() {
+  if (LL_TIM_IsActiveFlag_CC1(BLDC_HALL_TIM_PORT)) {
+    LL_TIM_ClearFlag_CC1(BLDC_HALL_TIM_PORT);
+
+    uint32_t cc1 = LL_TIM_IC_GetCaptureCH1(BLDC_HALL_TIM_PORT);
+    _hall_tim_count_old =
+        _hall_tim_count < 0xFFFFFFFF - cc1 ? _hall_tim_count + cc1 : 0xFFFFFFFF;
+    _hall_tim_count = 0;
+
+    BLDC_Direction_t dir = _direction;
+    uint8_t pos = BLDC_ReadPosition();
+    BLDC_PreloadPWMOutput(pos, dir);
+    LL_TIM_GenerateEvent_COM(BLDC_PWM_TIM_PORT);
+    BLDC_PreloadPWMOutput(next_pos(pos, dir), dir);
+
+  } else if (LL_TIM_IsActiveFlag_UPDATE(BLDC_HALL_TIM_PORT)) {
+    LL_TIM_ClearFlag_UPDATE(BLDC_HALL_TIM_PORT);
+
+    _hall_tim_count =
+        _hall_tim_count < 0xFFFF0000 ? _hall_tim_count + 0xFFFF : 0xFFFFFFFF;
+
+    if (_hall_tim_count > _hall_tim_count_old)
+      _hall_tim_count_old = _hall_tim_count;
+  }
 }

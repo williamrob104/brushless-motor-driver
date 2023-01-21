@@ -25,6 +25,9 @@ void BLDC_SetDirection(BLDC_Direction_t direction);
 
 BLDC_Direction_t BLDC_GetDirection(void);
 
+// speed in rev/s
+float BLDC_GetSpeed(void);
+
 void BLDC_HALL_TIM_IRQHandler();
 
 #ifdef __cplusplus

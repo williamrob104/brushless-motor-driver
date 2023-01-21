@@ -24,6 +24,7 @@
 #include <stdio.h>
 
 #include "bldc_hall.h"
+#include "printf.h"
 #include "ssd1306.h"
 /* USER CODE END Includes */
 
@@ -123,8 +124,20 @@ int main(void) {
     ssd1306_Fill(Black);
     char buf[30];
 
-    sprintf(buf, "%u", LL_ADC_REG_ReadConversionData12(ADC1));
-    ssd1306_SetCursor(0, 24);
+    ssd1306_SetCursor(0, 0);
+    ssd1306_WriteString(BLDC_GetDirection() == DIRECTION_POSITIVE
+                            ? "Dir: positive"
+                            : "Dir: negative",
+                        Font_7x10, White);
+
+    sprintf(buf, "Duty cycle: %.1f%%",
+            (float)LL_ADC_REG_ReadConversionData12(ADC1) /
+                BLDC_PWM_TIM_Autoreload * 100);
+    ssd1306_SetCursor(0, 15);
+    ssd1306_WriteString(buf, Font_7x10, White);
+
+    sprintf(buf, "Speed: %.0f rpm", BLDC_GetSpeed() * 60);
+    ssd1306_SetCursor(0, 30);
     ssd1306_WriteString(buf, Font_7x10, White);
 
     ssd1306_UpdateScreen();

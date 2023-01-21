@@ -56,4 +56,7 @@
 #define BLDC_COM_ABC_010 LL_TIM_CHANNEL_CH1 | LL_TIM_CHANNEL_CH2N
 #define BLDC_COM_ABC_011 LL_TIM_CHANNEL_CH1 | LL_TIM_CHANNEL_CH3N
 
+/* number of poles of the rotor */
+#define BLDC_NUM_POLES 4
+
 #endif  // __BLDC_CONF_H__
