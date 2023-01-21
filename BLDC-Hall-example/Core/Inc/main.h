@@ -28,17 +28,16 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_ll_adc.h"
-#include "stm32f1xx_ll_dac.h"
-#include "stm32f1xx_ll_rcc.h"
 #include "stm32f1xx_ll_bus.h"
-#include "stm32f1xx_ll_system.h"
-#include "stm32f1xx_ll_exti.h"
 #include "stm32f1xx_ll_cortex.h"
-#include "stm32f1xx_ll_utils.h"
-#include "stm32f1xx_ll_pwr.h"
 #include "stm32f1xx_ll_dma.h"
-#include "stm32f1xx_ll_tim.h"
+#include "stm32f1xx_ll_exti.h"
 #include "stm32f1xx_ll_gpio.h"
+#include "stm32f1xx_ll_pwr.h"
+#include "stm32f1xx_ll_rcc.h"
+#include "stm32f1xx_ll_system.h"
+#include "stm32f1xx_ll_tim.h"
+#include "stm32f1xx_ll_utils.h"
 
 #if defined(USE_FULL_ASSERT)
 #include "stm32_assert.h"
@@ -72,24 +71,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define V_BUS_Pin LL_GPIO_PIN_1
-#define V_BUS_GPIO_Port GPIOC
-#define EA_Pin LL_GPIO_PIN_0
-#define EA_GPIO_Port GPIOA
-#define EB_Pin LL_GPIO_PIN_1
-#define EB_GPIO_Port GPIOA
-#define EZ_Pin LL_GPIO_PIN_2
-#define EZ_GPIO_Port GPIOA
-#define DAC1_Pin LL_GPIO_PIN_4
-#define DAC1_GPIO_Port GPIOA
-#define DAC2_Pin LL_GPIO_PIN_5
-#define DAC2_GPIO_Port GPIOA
-#define M_IA_Pin LL_GPIO_PIN_6
-#define M_IA_GPIO_Port GPIOA
-#define M_IB_Pin LL_GPIO_PIN_7
-#define M_IB_GPIO_Port GPIOA
-#define M_IC_Pin LL_GPIO_PIN_4
-#define M_IC_GPIO_Port GPIOC
 #define BUTTON_RUN_Pin LL_GPIO_PIN_5
 #define BUTTON_RUN_GPIO_Port GPIOC
 #define BUTTON_RUN_EXTI_IRQn EXTI9_5_IRQn
@@ -125,12 +106,6 @@ void Error_Handler(void);
 #define PWM2H_GPIO_Port GPIOA
 #define PWM3H_Pin LL_GPIO_PIN_10
 #define PWM3H_GPIO_Port GPIOA
-#define IN1_Pin LL_GPIO_PIN_10
-#define IN1_GPIO_Port GPIOC
-#define IN2_Pin LL_GPIO_PIN_11
-#define IN2_GPIO_Port GPIOC
-#define IN3_Pin LL_GPIO_PIN_12
-#define IN3_GPIO_Port GPIOC
 #define OLED_CS_Pin LL_GPIO_PIN_3
 #define OLED_CS_GPIO_Port GPIOB
 #define OLED_DC_Pin LL_GPIO_PIN_4
@@ -142,16 +117,21 @@ void Error_Handler(void);
 #define OLED_CLK_Pin LL_GPIO_PIN_9
 #define OLED_CLK_GPIO_Port GPIOB
 #ifndef NVIC_PRIORITYGROUP_0
-#define NVIC_PRIORITYGROUP_0         ((uint32_t)0x00000007) /*!< 0 bit  for pre-emption priority,
-                                                                 4 bits for subpriority */
-#define NVIC_PRIORITYGROUP_1         ((uint32_t)0x00000006) /*!< 1 bit  for pre-emption priority,
-                                                                 3 bits for subpriority */
-#define NVIC_PRIORITYGROUP_2         ((uint32_t)0x00000005) /*!< 2 bits for pre-emption priority,
-                                                                 2 bits for subpriority */
-#define NVIC_PRIORITYGROUP_3         ((uint32_t)0x00000004) /*!< 3 bits for pre-emption priority,
-                                                                 1 bit  for subpriority */
-#define NVIC_PRIORITYGROUP_4         ((uint32_t)0x00000003) /*!< 4 bits for pre-emption priority,
-                                                                 0 bit  for subpriority */
+#define NVIC_PRIORITYGROUP_0                                   \
+  ((uint32_t)0x00000007) /*!< 0 bit  for pre-emption priority, \
+                              4 bits for subpriority */
+#define NVIC_PRIORITYGROUP_1                                   \
+  ((uint32_t)0x00000006) /*!< 1 bit  for pre-emption priority, \
+                              3 bits for subpriority */
+#define NVIC_PRIORITYGROUP_2                                   \
+  ((uint32_t)0x00000005) /*!< 2 bits for pre-emption priority, \
+                              2 bits for subpriority */
+#define NVIC_PRIORITYGROUP_3                                   \
+  ((uint32_t)0x00000004) /*!< 3 bits for pre-emption priority, \
+                              1 bit  for subpriority */
+#define NVIC_PRIORITYGROUP_4                                   \
+  ((uint32_t)0x00000003) /*!< 4 bits for pre-emption priority, \
+                              0 bit  for subpriority */
 #endif
 
 /* USER CODE BEGIN Private defines */
