@@ -1,5 +1,5 @@
-#ifndef __BLDC_H__
-#define __BLDC_H__
+#ifndef __BLDC_HALL_H__
+#define __BLDC_HALL_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,4 +34,4 @@ void BLDC_HALL_TIM_IRQHandler();
 }
 #endif
 
-#endif  // __BLDC_H__
+#endif  // __BLDC_HALL_H__
