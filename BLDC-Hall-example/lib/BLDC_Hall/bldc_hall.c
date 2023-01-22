@@ -59,7 +59,7 @@ static void BLDC_InitHallPheripherals(void) {
   TIM_IC_InitStruct.ICFilter = LL_TIM_IC_FILTER_FDIV1;
   LL_TIM_IC_Init(BLDC_HALL_TIM_PORT, LL_TIM_CHANNEL_CH1, &TIM_IC_InitStruct);
 
-  // set TIM trigger output to OC2REF
+  // set TIM trigger output to CC1
   LL_TIM_SetTriggerOutput(BLDC_HALL_TIM_PORT, LL_TIM_TRGO_CC1IF);
 
   // set interrupt generation when overflow
