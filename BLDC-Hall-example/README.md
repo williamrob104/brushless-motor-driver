@@ -4,7 +4,7 @@
 
 Below shows the commutation sequence of a motor, assuming Hall sensors placed 120° electrically apart. Refer to the [TI blog post](https://e2e.ti.com/blogs_/b/industrial_strength/posts/generate-your-own-commutation-table-part-2) to generate your own commutation sequence.
 
-![Commutation sequence](images/Commutation-sequence.png)
+<img src="images/Commutation-sequence.png" alt="Commutation sequence" width="600"/>
 
 To rotate in the positive and negative direction, the commutation table is
 <table>
